@@ -1,0 +1,467 @@
+<!DOCTYPE` html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Competition Registration Manager</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f7fb;
+    color:#222;
+    transition:.3s;
+}
+
+.dark{
+    background:#1c1c1c;
+    color:white;
+}
+
+header{
+    background:#173b70;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+nav{
+    background:white;
+    padding:15px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.dark nav{
+    background:#2b2b2b;
+}
+
+nav a{
+    text-decoration:none;
+    margin:0 15px;
+    color:#173b70;
+    font-weight:bold;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:20px auto;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    text-align:center;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.dark .card{
+    background:#2b2b2b;
+}
+
+.card h2{
+    color:#173b70;
+}
+
+.section{
+    background:white;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.dark .section{
+    background:#2b2b2b;
+}
+
+label{
+    display:block;
+    margin-top:12px;
+    font-weight:bold;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:5px;
+}
+
+button{
+    margin-top:15px;
+    padding:10px 20px;
+    border:none;
+    background:#173b70;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#0f2647;
+}
+
+.success{
+    margin-top:15px;
+    padding:10px;
+    background:#d4edda;
+    color:#155724;
+    border-radius:5px;
+    display:none;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#173b70;
+    color:white;
+}
+
+.search-box{
+    margin-top:20px;
+}
+
+footer{
+    text-align:center;
+    background:#173b70;
+    color:white;
+    padding:20px;
+    margin-top:30px;
+}
+
+.status-full{
+    color:red;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Competition Registration Manager</h1>
+    <p>Manage Competitions & Student Registrations</p>
+    <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+</header>
+
+<nav>
+    <a href="#">Home</a>
+    <a href="#register">Register</a>
+    <a href="#records">Records</a>
+</nav>
+
+<div class="container">
+
+    <div class="cards">
+        <div class="card">
+            <h2>6</h2>
+            <p>Competitions</p>
+        </div>
+
+        <div class="card">
+            <h2 id="totalStudents">0</h2>
+            <p>Registered Students</p>
+        </div>
+
+        <div class="card">
+            <h2 id="availableSeats">300</h2>
+            <p>Available Seats</p>
+        </div>
+
+        <div class="card">
+            <h2>Active</h2>
+            <p>Status</p>
+        </div>
+    </div>
+
+    <div class="section" id="register">
+        <h2>Competition Registration</h2>
+
+        <form id="registrationForm">
+
+            <label>Student Name</label>
+            <input type="text" id="name" required>
+
+            <label>Student ID</label>
+            <input type="text" id="studentId" required>
+
+            <label>Email</label>
+            <input type="email" id="email" required>
+
+            <label>Select Competition</label>
+
+            <select id="competition" required>
+                <option value="">Select Competition</option>
+                <option>Web Development</option>
+                <option>Hackathon</option>
+                <option>Quiz Competition</option>
+                <option>Photography</option>
+                <option>Robotics</option>
+                <option>Gaming</option>
+            </select>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div id="message" class="success"></div>
+    </div>
+
+    <div class="section">
+        <h2>Competition Capacity</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Competition</th>
+                    <th>Remaining Seats</th>
+                </tr>
+            </thead>
+
+            <tbody id="capacityTable"></tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Search Registration</h2>
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search-box"
+            placeholder="Search by Name or Student ID"
+            onkeyup="renderRegistrations()">
+    </div>
+
+    <div class="section" id="records">
+        <h2>Registered Students</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Competition</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="registrationTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<footer>
+    <p>© 2026 Campus Competition Registration Manager</p>
+</footer>
+
+<script>
+
+let capacities = {
+    "Web Development": 50,
+    "Hackathon": 60,
+    "Quiz Competition": 100,
+    "Photography": 25,
+    "Robotics": 40,
+    "Gaming": 25
+};
+
+let registrations =
+JSON.parse(localStorage.getItem("registrations")) || [];
+
+function initializeSeats() {
+    registrations.forEach(student => {
+        capacities[student.competition]--;
+    });
+
+    renderCapacity();
+}
+
+document
+.getElementById("registrationForm")
+.addEventListener("submit", registerStudent);
+
+function registerStudent(e) {
+
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const studentId = document.getElementById("studentId").value;
+    const email = document.getElementById("email").value;
+    const competition = document.getElementById("competition").value;
+
+    const duplicate = registrations.some(
+        student => student.id === studentId
+    );
+
+    if (duplicate) {
+        alert("Student ID already registered!");
+        return;
+    }
+
+    if (capacities[competition] <= 0) {
+        alert("Competition Full!");
+        return;
+    }
+
+    const student = {
+        name,
+        id: studentId,
+        email,
+        competition
+    };
+
+    registrations.push(student);
+
+    capacities[competition]--;
+
+    localStorage.setItem(
+        "registrations",
+        JSON.stringify(registrations)
+    );
+
+    renderRegistrations();
+    renderCapacity();
+    updateDashboard();
+
+    const message =
+        document.getElementById("message");
+
+    message.style.display = "block";
+    message.innerHTML =
+        `✅ Registration Successful for <b>${name}</b>`;
+
+    document
+        .getElementById("registrationForm")
+        .reset();
+}
+
+function renderRegistrations() {
+
+    const table =
+        document.getElementById("registrationTable");
+
+    const search =
+        document.getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    table.innerHTML = "";
+
+    registrations
+        .filter(student =>
+            student.name.toLowerCase().includes(search) ||
+            student.id.toLowerCase().includes(search)
+        )
+        .forEach((student, index) => {
+
+            table.innerHTML += `
+            <tr>
+                <td>${student.name}</td>
+                <td>${student.id}</td>
+                <td>${student.email}</td>
+                <td>${student.competition}</td>
+                <td>
+                    <button onclick="deleteRegistration(${index})">
+                        Delete
+                    </button>
+                </td>
+            </tr>`;
+        });
+}
+
+function deleteRegistration(index) {
+
+    let comp = registrations[index].competition;
+
+    capacities[comp]++;
+
+    registrations.splice(index, 1);
+
+    localStorage.setItem(
+        "registrations",
+        JSON.stringify(registrations)
+    );
+
+    renderRegistrations();
+    renderCapacity();
+    updateDashboard();
+}
+
+function renderCapacity() {
+
+    const table =
+        document.getElementById("capacityTable");
+
+    table.innerHTML = "";
+
+    for (let comp in capacities) {
+
+        table.innerHTML += `
+        <tr>
+            <td>${comp}</td>
+            <td>
+                ${capacities[comp] > 0
+                ? capacities[comp]
+                : '<span class="status-full">Full</span>'}
+            </td>
+        </tr>`;
+    }
+}
+
+function updateDashboard() {
+
+    document.getElementById("totalStudents").innerText =
+        registrations.length;
+
+    let totalSeats = 0;
+
+    for (let comp in capacities) {
+        totalSeats += capacities[comp];
+    }
+
+    document.getElementById("availableSeats").innerText =
+        totalSeats;
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+}
+
+initializeSeats();
+renderRegistrations();
+renderCapacity();
+updateDashboard();
+
+</script>
+
+</body>
+</html>
